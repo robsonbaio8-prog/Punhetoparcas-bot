@@ -79,7 +79,21 @@ Comandos:
 /ajuda - Esta mensagem
     """)
 
-# Sistema de palavras proibidas (simplificado)
+# Bloqueio de links (só admins podem enviar)
+@bot.message_handler(func=lambda m: True)
+def block_links(message):
+    if message.from_user.id == ADMIN_ID:
+        return
+
+    if message.entities:
+        for entity in message.entities:
+            if entity.type in ['url', 'text_link']:
+                bot.delete_message(message.chat.id, message.message_id)
+                warning = bot.send_message(message.chat.id, "🚫 Apenas admins podem enviar links!")
+                threading.Timer(15, lambda: bot.delete_message(message.chat.id, warning.message_id)).start()
+                return
+
+# Sistema de palavras proibidas
 @bot.message_handler(func=lambda m: True)
 def filter_words(message):
     if message.from_user.id == ADMIN_ID:
