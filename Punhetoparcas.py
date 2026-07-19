@@ -5,7 +5,7 @@ TOKEN = '6108990032:AAFpdv0KmEPOwY3DlSnv32YPGL0dwfHmFmU'
 bot = telebot.TeleBot(TOKEN)
 
 GRUPO_NOME = "Putaria dos Parças"
-GRUPO_LINK = 'https://t.me/+CU0LO7sCpLdjMmIx'
+GRUPO_LINK = 'https://t.me/+dO79EwVFMak2YzY0'
 ADMIN_ID = 918023038
 
 REGRAS = f"""
