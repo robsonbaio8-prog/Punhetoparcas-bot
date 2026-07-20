@@ -111,7 +111,7 @@ def filter_words(message):
                 pass
             return
 
-# Boas-vindas e deleção de mensagens de serviço
+# Boas-vindas com deleção automática após 60 segundos
 @bot.message_handler(content_types=['new_chat_members'])
 def welcome_new_member(message):
     try:
@@ -121,8 +121,23 @@ def welcome_new_member(message):
 
     for member in message.new_chat_members:
         if not member.is_bot:
-            bot.send_message(message.chat.id, f"👋 Bem-vindo(a), **{member.first_name}**! {REGRAS}", parse_mode='Markdown')
+            try:
+                sent_msg = bot.send_message(
+                    message.chat.id, 
+                    f"👋 Bem-vindo(a), **{member.first_name}**! {REGRAS}", 
+                    parse_mode='Markdown'
+                )
+                # Deleta a mensagem de boas-vindas após 60 segundos
+                def delete_welcome():
+                    try:
+                        bot.delete_message(message.chat.id, sent_msg.message_id)
+                    except:
+                        pass
+                threading.Timer(60, delete_welcome).start()
+            except:
+                pass
 
+# Deleção de todas as mensagens de serviço
 @bot.message_handler(content_types=[
     'left_chat_member', 
     'new_chat_title', 
