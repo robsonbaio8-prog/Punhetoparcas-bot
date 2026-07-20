@@ -84,13 +84,15 @@ Comandos:
 def block_links(message):
     if message.from_user.id == ADMIN_ID:
         return
-
     if message.entities:
         for entity in message.entities:
             if entity.type in ['url', 'text_link']:
-                bot.delete_message(message.chat.id, message.message_id)
-                warning = bot.send_message(message.chat.id, "🚫 Apenas admins podem enviar links!")
-                threading.Timer(15, lambda: bot.delete_message(message.chat.id, warning.message_id)).start()
+                try:
+                    bot.delete_message(message.chat.id, message.message_id)
+                    warning = bot.send_message(message.chat.id, "🚫 Apenas admins podem enviar links!")
+                    threading.Timer(15, lambda: bot.delete_message(message.chat.id, warning.message_id)).start()
+                except:
+                    pass
                 return
 
 # Sistema de palavras proibidas
@@ -98,16 +100,18 @@ def block_links(message):
 def filter_words(message):
     if message.from_user.id == ADMIN_ID:
         return
-
     text = message.text.lower() if message.text else ""
     palavras_proibidas = ["menor", "lolita", "pedo", "criança", "kid", "underage", "spam", "flood"]
-
     for palavra in palavras_proibidas:
         if palavra in text:
-            bot.delete_message(message.chat.id, message.message_id)
-            bot.send_message(message.chat.id, "⚠️ Palavra proibida detectada! Cuidado com o que posta.")
+            try:
+                bot.delete_message(message.chat.id, message.message_id)
+                bot.send_message(message.chat.id, "⚠️ Palavra proibida detectada! Cuidado com o que posta.")
+            except:
+                pass
             return
 
+# Boas-vindas e deleção de mensagens de serviço
 @bot.message_handler(content_types=['new_chat_members'])
 def welcome_new_member(message):
     try:
@@ -119,7 +123,17 @@ def welcome_new_member(message):
         if not member.is_bot:
             bot.send_message(message.chat.id, f"👋 Bem-vindo(a), **{member.first_name}**! {REGRAS}", parse_mode='Markdown')
 
-@bot.message_handler(content_types=['left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'pinned_message'])
+@bot.message_handler(content_types=[
+    'left_chat_member', 
+    'new_chat_title', 
+    'new_chat_photo', 
+    'delete_chat_photo', 
+    'group_chat_created', 
+    'supergroup_chat_created', 
+    'channel_chat_created', 
+    'message_auto_delete_timer_changed',
+    'pinned_message'
+])
 def delete_service_messages(message):
     try:
         bot.delete_message(message.chat.id, message.message_id)
